@@ -8,6 +8,27 @@ from common.logging.api import Logger
 
 
 def new_logger(logger=None, processors=None, disabled_loggers=None) -> Logger:
+    """Create a new logger conform to Logger API
+
+    Args:
+        logger: a standard py logger or None to create a default
+        processors: a list of processors for modify structlog output
+
+    Returns:
+        a Logger matching common.logging.api
+
+    Example:
+        # default settings
+        from common.logging import structlogger
+        logger = structlogger.new_logger()
+
+        # from configured standard logging - format must have only %(message)s
+        import logging
+        logging.basicConfig(
+            format="%(message)s", level=logging.INFO, stream=sys.stdout,
+        )
+        logger = structlogger.new_logger(logger=logging.getLogger(__name__))
+    """
     logger = logger if logger else default_logger()
     processors_chain = processors if processors else default_processors_chain()
     if disabled_loggers:
@@ -39,6 +60,11 @@ def default_processors_chain():
 
 
 def default_logger():
+    """Default standard logging.logger
+
+    With hardcoded logger name: "std_structlogger"
+    With stdout and file output: "/tmp/std_structlogger-{uuid4}"
+    """
     import sys
     import uuid
 
@@ -56,6 +82,7 @@ def default_logger():
 
 
 def disable_loggers(disabled: Iterable[str]):
+    """Disable specific logger - unused for now"""
     for logger in disabled:
         log = logging.getLogger(logger)
         log.setLevel(logging.ERROR)
